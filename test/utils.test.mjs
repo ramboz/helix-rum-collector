@@ -18,6 +18,7 @@ import {
   getForwardedHost,
   getMaskedUserAgent,
   getSubsystem,
+  isValidCheckpoint,
   isValidId,
   maskTime,
   sourceTargetValidator,
@@ -170,6 +171,13 @@ describe('Test Utils', () => {
 
   describe('Source & Target validators', () => {
     describe('audience', () => {
+      it('validates the checkpoint', () => {
+        assert.ok(isValidCheckpoint('audience'));
+
+        // Making sure legacy audiences are not tracked anymore
+        assert.ok(!isValidCheckpoint('audiences'));
+      });
+
       it('has a validator for the "audience" checkpoint', () => {
         assert.ok(sourceTargetValidator.audience);
       });
@@ -185,6 +193,10 @@ describe('Test Utils', () => {
         assert.ok(!sourceTargetValidator.audience('foo', 'bar:baz'));
         assert.ok(!sourceTargetValidator.audience('foo bar', 'baz qux'));
         assert.ok(!sourceTargetValidator.audience('foo!', 'foo!'));
+
+        // Making sure legay audiences are not tracked anymore
+        assert.ok(!sourceTargetValidator.audience('audience-desktop', 'desktop'));
+        assert.ok(!sourceTargetValidator.audience('home-template audience-desktop', 'desktop'));
       });
     });
 
